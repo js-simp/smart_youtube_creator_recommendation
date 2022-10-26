@@ -6,7 +6,6 @@ const cors = require('cors');
 dotenv.config();
 
 const app = express()
-const KEY = process.env.API_KEY
 const PORT = process.env.PORT || 5000;
 //allocate environment variables
 
@@ -19,8 +18,6 @@ app.use(cors({
 ));
 
 app.use('/', require('./channels'))
-app.use('/activities', require('./activities'))
-app.use('/search', require('./search'))
 
 //start listening on port
 app.listen(PORT, () => {
