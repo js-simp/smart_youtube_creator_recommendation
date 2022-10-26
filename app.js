@@ -13,11 +13,7 @@ const API_KEY = process.env.API_KEY;
 
 //Middlware
 app.use(express.json());
-// app.use(cors({
-//     origin : origin,
-//     credentials : true,
-// }
-// ));
+
 
 // Each API may support multiple versions. With this sample, we're getting
 // v3 of the youtube API, and using an API key to authenticate.
@@ -41,7 +37,7 @@ async function findActivities() {
     channelId: 'UCSHZKyawb77ixDdsGog4iWA',
     maxResults: 10
   });
-  console.log(res.data);
+  console.log(res.data.items);
 }
 
 async function getChannelInfo() {
@@ -52,9 +48,9 @@ async function getChannelInfo() {
   console.log(res.data);
 }
 
-runSearch()
+// runSearch()
 findActivities()
-getChannelInfo()
+// getChannelInfo()
 
 //start listening on port
 app.listen(PORT, () => {
