@@ -1,7 +1,6 @@
 const express = require('express');
 const session = require('express-session')
 const dotenv = require('dotenv')
-const cors = require('cors');
 const youtube_api = require('@googleapis/youtube');
 
 dotenv.config();
@@ -31,13 +30,28 @@ async function runSearch() {
     console.log(res.data);
   }
 
+async function channelSearch() {
+  let date = Date(2020-03-25)
+  const res = await youtube.search.list({
+    part: 'snippet',
+    location : '7.291418, 80.636696',
+    locationRadius: '50km',
+    type: 'video',
+    videoCategoryId: '27',
+    pageToken: 'CBQQAA',
+    topicId:'/m/09s1f',
+    maxResults: 20,
+  });
+  console.log(res.data.items);
+}
+
 async function findActivities() {
   const res = await youtube.activities.list({
     part: 'snippet,contentDetails',
     channelId: 'UCSHZKyawb77ixDdsGog4iWA',
-    maxResults: 10
+    maxResults: 5
   });
-  console.log(res.data.items);
+  console.log(res.data);
 }
 
 async function getChannelInfo() {
@@ -49,8 +63,9 @@ async function getChannelInfo() {
 }
 
 // runSearch()
-findActivities()
+// findActivities()
 // getChannelInfo()
+channelSearch()
 
 //start listening on port
 app.listen(PORT, () => {
