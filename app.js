@@ -26,15 +26,36 @@ const youtube = youtube_api.youtube({
     auth: API_KEY
   });
 
-async function runSample() {
+async function runSearch() {
     const res = await youtube.search.list({
-      part: 'id,snippet',
-      q: 'Node.js on Google Cloud',
+      part: 'snippet',
+      relatedToVideoId: 'h8KXWJIgqLs',
+      type: 'video'
     });
     console.log(res.data);
   }
 
-runSample()
+async function findActivities() {
+  const res = await youtube.activities.list({
+    part: 'snippet,contentDetails',
+    channelId: 'UCSHZKyawb77ixDdsGog4iWA',
+    maxResults: 10
+  });
+  console.log(res.data);
+}
+
+async function getChannelInfo() {
+  const res = await youtube.channels.list({
+    part: 'brandingSettings,contentDetails,contentOwnerDetails,id,localizations,snippet,statistics,status,topicDetails',
+    channelId: 'UCRBpynZV0b7ww2XMCfC17qg',
+  });
+  console.log(res.data);
+}
+
+runSearch()
+findActivities()
+getChannelInfo()
+
 //start listening on port
 app.listen(PORT, () => {
     console.log(`Listening on port ... ${PORT}`)
