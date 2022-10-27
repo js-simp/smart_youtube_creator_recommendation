@@ -35,7 +35,7 @@ async function channelSearch() {
   const res = await youtube.search.list({
     part: 'snippet',
     location : '7.291418, 80.636696',
-    locationRadius: '50km',
+    locationRadius: '200km',
     type: 'video',
     videoCategoryId: '27',
     pageToken: 'CBQQAA',
