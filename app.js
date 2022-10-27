@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session')
 const dotenv = require('dotenv')
 const youtube_api = require('@googleapis/youtube');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -62,10 +63,26 @@ async function getChannelInfo() {
   console.log(res.data);
 }
 
+async function getVidCategories() {
+  const res = await youtube.videoCategories.list({
+    part: 'snippet',
+    regionCode: 'LK',
+  });
+  // console.log(res.data.items);
+  res.data.items.forEach(item => {
+    fs.writeFile('video-categories.json', JSON.stringify(item.snippet), function(err) {
+      if(err) {
+        console.log(err);
+      }
+      console.log("Complete")
+    })
+  });
+}
 // runSearch()
 // findActivities()
 // getChannelInfo()
-channelSearch()
+// channelSearch()
+getVidCategories()
 
 //start listening on port
 app.listen(PORT, () => {
