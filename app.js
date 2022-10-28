@@ -3,7 +3,7 @@ const session = require('express-session')
 const dotenv = require('dotenv')
 const youtube_api = require('@googleapis/youtube');
 const fs = require('fs');
-
+const readline = require('readline')
 dotenv.config();
 
 const app = express()
@@ -88,12 +88,46 @@ function addVidCategories(data_arr) {
     console.log('Complete')
   })
 }
+
+async function getTopicIds() {
+  const fileStream = fs.createReadStream('topicIDs.txt');
+
+  const rl = readline.createInterface({
+    input: fileStream,
+    crlfDelay: Infinity
+  });
+  // Note: we use the crlfDelay option to recognize all instances of CR LF
+  // ('\r\n') in input.txt as a single line break.
+  let topicId = {}
+  for await (const line of rl) {
+    let currect_section = '';
+    // Each line in input.txt will be successively available here as `line`.
+    // console.log(`Line from file: ${line}`);
+    if(line[0] != '/') {
+      current_section = line;
+      topicId[line] = {};
+    }
+    else{
+      topic_arr = line.split('|')
+      topicId[current_section][topic_arr[0]] = topic_arr[1]
+    }
+
+  }
+
+  // console.log(topicId)
+  fs.writeFile('topic-categories.json', JSON.stringify(topicId, null, '\t') , function(err) {
+    if(err) {
+      console.log(err);
+    }
+    console.log('Complete')
+  })
+}
 // runSearch()
 // findActivities()
 // getChannelInfo()
 // channelSearch()
-getVidCategories()
-
+// getVidCategories()
+getTopicIds()
 //start listening on port
 app.listen(PORT, () => {
     console.log(`Listening on port ... ${PORT}`)
