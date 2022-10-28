@@ -69,14 +69,24 @@ async function getVidCategories() {
     regionCode: 'LK',
   });
   // console.log(res.data.items);
-  res.data.items.forEach(item => {
-    fs.writeFile('video-categories.json', JSON.stringify(item.snippet), function(err) {
-      if(err) {
-        console.log(err);
-      }
-      console.log("Complete")
-    })
+  addVidCategories(res.data.items)
+}
+function addVidCategories(data_arr) {
+  let categories = {
+    snippet_arr : []
+  }
+  data_arr.forEach(item => {
+    let snippet = item.snippet;
+    snippet.id = item.id;
+    categories.snippet_arr.push(snippet);
   });
+  
+  fs.writeFile('video-categories.json', JSON.stringify(categories, null, '\t') , function(err) {
+    if(err) {
+      console.log(err);
+    }
+    console.log('Complete')
+  })
 }
 // runSearch()
 // findActivities()
