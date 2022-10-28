@@ -21,7 +21,6 @@ const youtube = youtube_api.youtube({
     version: 'v3',
     auth: API_KEY
   });
-
 async function runSearch() {
     const res = await youtube.search.list({
       part: 'snippet',
@@ -30,20 +29,68 @@ async function runSearch() {
     });
     console.log(res.data);
   }
-
-async function channelSearch() {
-  let date = Date(2020-03-25)
-  const res = await youtube.search.list({
+function createOptions(nextPageToken, category) {
+  let date = new Date(2022-01-21)
+  let options = {
     part: 'snippet',
     location : '7.291418, 80.636696',
     locationRadius: '200km',
     type: 'video',
-    videoCategoryId: '27',
-    pageToken: 'CBQQAA',
-    topicId:'/m/09s1f',
-    maxResults: 20,
+    publishedAfter	: date.toISOString(),
+    videoCategoryId: category,
+    pageToken: nextPageToken ,
+    maxResults: 50,
+  }
+
+  return options
+}
+
+function createChannelOptions(channelId) {
+
+}
+
+async function channelSearch() {
+  
+  let nextPageToken = '';
+  let channels = {};
+  let res = await youtube.search.list(createOptions(nextPageToken, '27'));
+  res.data.items.forEach(item => {
+   
+    // console.log(item.snippet.channelId)
+    if(!(item.snippet.channelId in channels)){
+      channels[item.snippet.channelId] = ''
+    }
+    
   });
-  console.log(res.data.items);
+  // console.log(res.data);
+  let totalResults = res.data.pageInfo.totalResults;
+  let totalCycles = Math.floor(totalResults/50) < 50? Math.floor(totalResults/50) : 50;
+  let remainingResults = totalResults%50;
+  //run for loop to exhuast all results
+  for (let index = 1; index < totalCycles; index++) {
+    nextPageToken = res.data.nextPageToken;
+    res = await youtube.search.list(createOptions(nextPageToken, '27'));
+    res.data.items.forEach(item => {
+      if(!(item.snippet.channelId in channels)){
+        channels[item.snippet.channelId] = ''
+      }
+      // console.log(item.snippet.channelId)
+  });
+  }
+  
+  fs.writeFile('edu-channels.json', JSON.stringify(channels, null, '\t') , function(err) {
+    if(err) {
+      console.log(err);
+    }
+    console.log('Complete')
+  })
+  
+  /*
+  1) save the nextpage token
+  2) save all the channel Ids to array and remove any repeats
+  3) repeat procedure for nextpage results
+  */
+
 }
 
 async function findActivities() {
@@ -125,9 +172,9 @@ async function getTopicIds() {
 // runSearch()
 // findActivities()
 // getChannelInfo()
-// channelSearch()
+channelSearch()
 // getVidCategories()
-getTopicIds()
+// getTopicIds()
 //start listening on port
 app.listen(PORT, () => {
     console.log(`Listening on port ... ${PORT}`)
