@@ -58,31 +58,32 @@ async function channelSearch() {
    
     // console.log(item.snippet.channelId)
     if(!(item.snippet.channelId in channels)){
-      channels[item.snippet.channelId] = ''
+      channels[item.snippet.channelId] = item.snippet.channelTitle;
     }
     
   });
   // console.log(res.data);
   let totalResults = res.data.pageInfo.totalResults;
-  let totalCycles = Math.floor(totalResults/50) < 50? Math.floor(totalResults/50) : 50;
+  let totalCycles = Math.floor(totalResults/50) < 30? Math.floor(totalResults/50) : 30;
   let remainingResults = totalResults%50;
   //run for loop to exhuast all results
   for (let index = 1; index < totalCycles; index++) {
     nextPageToken = res.data.nextPageToken;
-    res = await youtube.search.list(createOptions(nextPageToken, '27'));
+    res = await youtube.search.list(createOptions(nextPageToken, '26'));
     res.data.items.forEach(item => {
       if(!(item.snippet.channelId in channels)){
-        channels[item.snippet.channelId] = ''
+        channels[item.snippet.channelId] = item.snippet.channelTitle
       }
       // console.log(item.snippet.channelId)
   });
   }
   
-  fs.writeFile('edu-channels.json', JSON.stringify(channels, null, '\t') , function(err) {
+  fs.writeFile('howto-channels.json', JSON.stringify(channels, null, '\t') , function(err) {
     if(err) {
       console.log(err);
     }
     console.log('Complete')
+    console.log(nextPageToken);
   })
   
   /*
