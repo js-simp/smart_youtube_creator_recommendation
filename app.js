@@ -29,7 +29,7 @@ async function runSearch() {
     });
     console.log(res.data);
   }
-function createOptions(nextPageToken, topic = '') {
+function createOptions(nextPageToken, topic) {
   let date = new Date(2022-01-21)
   let options = {
     part: 'snippet',
@@ -53,7 +53,7 @@ async function channelSearch() {
   
   let nextPageToken = '';
   let channels = {};
-  let res = await youtube.search.list(createOptions(nextPageToken, '', '/m/03glg'));
+  let res = await youtube.search.list(createOptions(nextPageToken, '/m/03glg'));
   res.data.items.forEach(item => {
    
     // console.log(item.snippet.channelId)
@@ -65,12 +65,12 @@ async function channelSearch() {
   // console.log(res.data);
   let totalResults = res.data.pageInfo.totalResults;
   console.log(totalResults);
-  let totalCycles = Math.floor(totalResults/50) < 70? Math.floor(totalResults/50) : 70;
+  let totalCycles = Math.floor(totalResults/50) < 10? Math.floor(totalResults/50) : 10;
   let remainingResults = totalResults%50;
   //run for loop to exhuast all results
   for (let index = 1; index < totalCycles; index++) {
     nextPageToken = res.data.nextPageToken;
-    res = await youtube.search.list(createOptions(nextPageToken, '', '/m/03glg'));
+    res = await youtube.search.list(createOptions(nextPageToken, '/m/03glg'));
     res.data.items.forEach(item => {
       if(!(item.snippet.channelId in channels)){
         channels[item.snippet.channelId] = item.snippet.channelTitle
