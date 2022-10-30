@@ -53,7 +53,7 @@ async function channelSearch() {
   
   let nextPageToken = '';
   let channels = {};
-  let res = await youtube.search.list(createOptions(nextPageToken, '27'));
+  let res = await youtube.search.list(createOptions(nextPageToken, '28'));
   res.data.items.forEach(item => {
    
     // console.log(item.snippet.channelId)
@@ -64,7 +64,8 @@ async function channelSearch() {
   });
   // console.log(res.data);
   let totalResults = res.data.pageInfo.totalResults;
-  let totalCycles = Math.floor(totalResults/50) < 30? Math.floor(totalResults/50) : 30;
+  console.log(totalResults);
+  let totalCycles = Math.floor(totalResults/50) < 20? Math.floor(totalResults/50) : 20;
   let remainingResults = totalResults%50;
   //run for loop to exhuast all results
   for (let index = 1; index < totalCycles; index++) {
@@ -78,7 +79,7 @@ async function channelSearch() {
   });
   }
   
-  fs.writeFile('howto-channels.json', JSON.stringify(channels, null, '\t') , function(err) {
+  fs.writeFile('science-tech-channels.json', JSON.stringify(channels, null, '\t') , function(err) {
     if(err) {
       console.log(err);
     }
