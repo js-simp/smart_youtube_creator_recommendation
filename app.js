@@ -40,10 +40,10 @@ function createOptions(nextPageToken, category) {
 }
 
 
-async function channelSearch(token = '') {
+async function channelSearch(token = '', filename) {
   
   let nextPageToken = token;
-  let channels = {};
+  let channels = readChannelsData(filename);
   //collect the total results available, and the first set of results in one call
   // let res = await youtube.search.list(createOptions(nextPageToken, '22'));
   let res = await api_functions.runSearch(youtube, createOptions(nextPageToken, '22'))
@@ -58,7 +58,7 @@ async function channelSearch(token = '') {
   // console.log(res.data);
   let totalResults = res.data.pageInfo.totalResults;
   console.log(totalResults);
-  let totalCycles = Math.floor(totalResults/50) < 5? Math.floor(totalResults/50) : 5;
+  let totalCycles = Math.floor(totalResults/50) < 60? Math.floor(totalResults/50) : 60;
   let remainingResults = totalResults%50;
   //run for loop to exhuast all results
   for (let index = 1; index < totalCycles; index++) {
@@ -73,18 +73,13 @@ async function channelSearch(token = '') {
   });
   }
 
-  writetoFile('people-channels.json', channels)
+  writetoFile(filename, channels)
   console.log(nextPageToken);
 }
 
-async function appendChannels(pageToken) {
-  let channels = readChannelsData('people-blogs-channels.json');
-  //make additions
-  writetoFile('people-blogs-channels.json', channels)
-}
 function readChannelsData(filename) {
   const channels_json = fs.readFileSync(filename, 'utf-8');
-  console.log(channels_json.length)
+  // console.log(channels_json.length)
   //check if file is empty
   if(channels_json.length === 0) {
     return {}
@@ -104,11 +99,9 @@ function writetoFile(filename, data) {
   })
 }
 
-// runSearch()
 // api_functions.findActivities(youtube)
 // api_functions.getChannelInfo(youtube)
-// channelSearch('CKYEEAA')
-readChannelsData('sample.json')
+channelSearch('', 'edu-channels.json')
 // api_functions.getVidCategories(youtube)
 // api_functions.getTopicIds()
 // appendtest('CKYEEAA')

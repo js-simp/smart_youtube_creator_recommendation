@@ -4,7 +4,7 @@ const readline = require('readline')
 let api_functions = {
     runSearch : async function runSearch(youtube, options) {
         const res = await youtube.search.list(options);
-        console.log(res.data);
+        // console.log(res.data);
         return res
       },
 
@@ -14,7 +14,7 @@ let api_functions = {
           channelId: 'UCSHZKyawb77ixDdsGog4iWA',
           maxResults: 5
         });
-        console.log(res.data);
+        // console.log(res.data);
       },
       
       getChannelInfo : async function getChannelInfo(youtube) {
