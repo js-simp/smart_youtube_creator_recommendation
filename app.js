@@ -45,15 +45,21 @@ function createOptions(nextPageToken, category_topic, isCategory) {
 
   return options
 }
-async function channelInfo(channelId) {
-  let res = await api_functions.getChannelInfo(youtube, channelId);
-  let channel_info = {}
-  let items=res.data.items;
-  channel_info[channelId] = res.data.items;
+async function channelInfo(filename) {
+  let channels = readChannelsData(filename);
+  let channel_info = {};
+  let channels_arr = Object.keys(channels);
+  console.log(channels_arr.length)
+  for (let index = 0; index < channels_arr.length; index++) {
+    const channelId = channels_arr[index];
+    let res = await api_functions.getChannelInfo(youtube, channelId);
+    channel_info[channelId] = res.data.items;
+  }
+
   // items.forEach(item => {
   //   console.log(item.snippet, item.statistics, item.contentDetails)
   // });
-  writetoFile('micro-creators.json', channel_info)
+  writetoFile('./lk_micro_creators/micro-creators.json', channel_info)
 }
 
 async function channelSearch(token = '', filename, category_topic, isCategory) {
@@ -117,7 +123,7 @@ function writetoFile(filename, data) {
 
 // api_functions.findActivities(youtube)
 
-channelInfo('UC9N1nzWyei0munVtz6zRt5w')
+channelInfo('./channels/people-blogs-channels.json')
 // channelSearch('CMgBEAA', './channels/entertainment-channels.json', '24', true)
 // api_functions.getVidCategories(youtube)
 // api_functions.getTopicIds()
