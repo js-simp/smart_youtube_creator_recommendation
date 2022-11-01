@@ -46,7 +46,7 @@ async function channelSearch(token = '', filename) {
   let channels = readChannelsData(filename);
   //collect the total results available, and the first set of results in one call
   // let res = await youtube.search.list(createOptions(nextPageToken, '22'));
-  let res = await api_functions.runSearch(youtube, createOptions(nextPageToken, '22'))
+  let res = await api_functions.runSearch(youtube, createOptions(nextPageToken, '24'))
   res.data.items.forEach(item => {
    
     // console.log(item.snippet.channelId)
@@ -58,13 +58,13 @@ async function channelSearch(token = '', filename) {
   // console.log(res.data);
   let totalResults = res.data.pageInfo.totalResults;
   console.log(totalResults);
-  let totalCycles = Math.floor(totalResults/50) < 60? Math.floor(totalResults/50) : 60;
+  let totalCycles = Math.floor(totalResults/50) < 75? Math.floor(totalResults/50) : 75;
   let remainingResults = totalResults%50;
   //run for loop to exhuast all results
   for (let index = 1; index < totalCycles; index++) {
     nextPageToken = res.data.nextPageToken;
     // res = await youtube.search.list(createOptions(nextPageToken, '22'));
-    res = await api_functions.runSearch(youtube, createOptions(nextPageToken, '22'))
+    res = await api_functions.runSearch(youtube, createOptions(nextPageToken, '24'))
     res.data.items.forEach(item => {
       if(!(item.snippet.channelId in channels)){
         channels[item.snippet.channelId] = item.snippet.channelTitle
@@ -101,7 +101,7 @@ function writetoFile(filename, data) {
 
 // api_functions.findActivities(youtube)
 // api_functions.getChannelInfo(youtube)
-channelSearch('', 'edu-channels.json')
+channelSearch('CMgBEAA', 'entertainment-channels.json')
 // api_functions.getVidCategories(youtube)
 // api_functions.getTopicIds()
 // appendtest('CKYEEAA')
