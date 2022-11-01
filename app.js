@@ -3,7 +3,7 @@ const session = require('express-session')
 const dotenv = require('dotenv')
 const youtube_api = require('@googleapis/youtube');
 const fs = require('fs');
-const readline = require('readline')
+const api_functions = require('./api-call-templates.js')
 dotenv.config();
 
 const app = express()
@@ -21,14 +21,8 @@ const youtube = youtube_api.youtube({
     version: 'v3',
     auth: API_KEY
   });
-async function runSearch() {
-    const res = await youtube.search.list({
-      part: 'snippet',
-      relatedToVideoId: 'h8KXWJIgqLs',
-      type: 'video'
-    });
-    console.log(res.data);
-  }
+
+
 function createOptions(nextPageToken, category) {
   let date = new Date(2022-01-21)
   let options = {
@@ -50,7 +44,9 @@ async function channelSearch(token = '') {
   
   let nextPageToken = token;
   let channels = {};
-  let res = await youtube.search.list(createOptions(nextPageToken, '22'));
+  //collect the total results available, and the first set of results in one call
+  // let res = await youtube.search.list(createOptions(nextPageToken, '22'));
+  let res = await api_functions.runSearch(youtube, createOptions(nextPageToken, '22'))
   res.data.items.forEach(item => {
    
     // console.log(item.snippet.channelId)
@@ -62,12 +58,13 @@ async function channelSearch(token = '') {
   // console.log(res.data);
   let totalResults = res.data.pageInfo.totalResults;
   console.log(totalResults);
-  let totalCycles = Math.floor(totalResults/50) < 20? Math.floor(totalResults/50) : 20;
+  let totalCycles = Math.floor(totalResults/50) < 5? Math.floor(totalResults/50) : 5;
   let remainingResults = totalResults%50;
   //run for loop to exhuast all results
   for (let index = 1; index < totalCycles; index++) {
     nextPageToken = res.data.nextPageToken;
-    res = await youtube.search.list(createOptions(nextPageToken, '22'));
+    // res = await youtube.search.list(createOptions(nextPageToken, '22'));
+    res = await api_functions.runSearch(youtube, createOptions(nextPageToken, '22'))
     res.data.items.forEach(item => {
       if(!(item.snippet.channelId in channels)){
         channels[item.snippet.channelId] = item.snippet.channelTitle
@@ -75,71 +72,31 @@ async function channelSearch(token = '') {
       // console.log(item.snippet.channelId)
   });
   }
-  
-  fs.writeFile('check-people-channels.json', JSON.stringify(channels, null, '\t') , function(err) {
-    if(err) {
-      console.log(err);
-    }
-    console.log('Complete')
-    console.log(nextPageToken);
-  })
-  
-  /*
-  1) save the nextpage token
-  2) save all the channel Ids to array and remove any repeats
-  3) repeat procedure for nextpage results
-  */
 
+  writetoFile('people-channels.json', channels)
+  console.log(nextPageToken);
 }
 
 async function appendChannels(pageToken) {
-  const channels_json = fs.readFileSync('people-blogs-channels.json', 'utf-8');
-  let channels = JSON.parse(channels_json);
-  channels['nextPage'] = pageToken;
-  fs.writeFile('people-blogs-channels.json', JSON.stringify(channels, null, '\t'), function(err) {
-    if(err) {
-      console.log(err);
-    }
-    console.log('Complete')
-  })
+  let channels = readChannelsData('people-blogs-channels.json');
+  //make additions
+  writetoFile('people-blogs-channels.json', channels)
 }
-
-async function findActivities() {
-  const res = await youtube.activities.list({
-    part: 'snippet,contentDetails',
-    channelId: 'UCSHZKyawb77ixDdsGog4iWA',
-    maxResults: 5
-  });
-  console.log(res.data);
-}
-
-async function getChannelInfo() {
-  const res = await youtube.channels.list({
-    part: 'brandingSettings,contentDetails,contentOwnerDetails,id,localizations,snippet,statistics,status,topicDetails',
-    channelId: 'UCRBpynZV0b7ww2XMCfC17qg',
-  });
-  console.log(res.data);
-}
-
-async function getVidCategories() {
-  const res = await youtube.videoCategories.list({
-    part: 'snippet',
-    regionCode: 'LK',
-  });
-  // console.log(res.data.items);
-  addVidCategories(res.data.items)
-}
-function addVidCategories(data_arr) {
-  let categories = {
-    snippet_arr : []
+function readChannelsData(filename) {
+  const channels_json = fs.readFileSync(filename, 'utf-8');
+  console.log(channels_json.length)
+  //check if file is empty
+  if(channels_json.length === 0) {
+    return {}
   }
-  data_arr.forEach(item => {
-    let snippet = item.snippet;
-    snippet.id = item.id;
-    categories.snippet_arr.push(snippet);
-  });
+  else{
+    let channels = JSON.parse(channels_json);
+    return channels
+  }
   
-  fs.writeFile('video-categories.json', JSON.stringify(categories, null, '\t') , function(err) {
+}
+function writetoFile(filename, data) {
+  fs.writeFile(filename, JSON.stringify(data, null, '\t') , function(err) {
     if(err) {
       console.log(err);
     }
@@ -147,45 +104,13 @@ function addVidCategories(data_arr) {
   })
 }
 
-async function getTopicIds() {
-  const fileStream = fs.createReadStream('topicIDs.txt');
-
-  const rl = readline.createInterface({
-    input: fileStream,
-    crlfDelay: Infinity
-  });
-  // Note: we use the crlfDelay option to recognize all instances of CR LF
-  // ('\r\n') in input.txt as a single line break.
-  let topicId = {}
-  for await (const line of rl) {
-    let currect_section = '';
-    // Each line in input.txt will be successively available here as `line`.
-    // console.log(`Line from file: ${line}`);
-    if(line[0] != '/') {
-      current_section = line;
-      topicId[line] = {};
-    }
-    else{
-      topic_arr = line.split('|')
-      topicId[current_section][topic_arr[0]] = topic_arr[1]
-    }
-
-  }
-
-  // console.log(topicId)
-  fs.writeFile('topic-categories.json', JSON.stringify(topicId, null, '\t') , function(err) {
-    if(err) {
-      console.log(err);
-    }
-    console.log('Complete')
-  })
-}
 // runSearch()
-// findActivities()
-// getChannelInfo()
-channelSearch('CKYEEAA')
-// getVidCategories()
-// getTopicIds()
+// api_functions.findActivities(youtube)
+// api_functions.getChannelInfo(youtube)
+// channelSearch('CKYEEAA')
+readChannelsData('sample.json')
+// api_functions.getVidCategories(youtube)
+// api_functions.getTopicIds()
 // appendtest('CKYEEAA')
 //start listening on port
 app.listen(PORT, () => {
