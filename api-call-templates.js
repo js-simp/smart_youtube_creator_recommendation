@@ -20,7 +20,7 @@ let api_functions = {
     getChannelInfo : async function getChannelInfo(youtube, channelId) {
       const res = await youtube.channels.list({
         part: 'brandingSettings,contentDetails,contentOwnerDetails,id,localizations,snippet,statistics,status,topicDetails',
-        channelId: channelId,
+        id: channelId,
       });
       return res
     },

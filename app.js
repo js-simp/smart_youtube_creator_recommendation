@@ -38,7 +38,13 @@ function createOptions(nextPageToken, category) {
 
   return options
 }
-
+async function channelInfo(channelId) {
+  let res = await api_functions.getChannelInfo(youtube, channelId);
+  let items=res.data.items;
+  items.forEach(item => {
+    console.log(item.snippet, item.statistics, item.contentDetails)
+  });
+}
 
 async function channelSearch(token = '', filename) {
   
@@ -100,7 +106,8 @@ function writetoFile(filename, data) {
 }
 
 // api_functions.findActivities(youtube)
-api_functions.getChannelInfo(youtube, channelId)
+
+channelInfo('UC9N1nzWyei0munVtz6zRt5w')
 // channelSearch('CMgBEAA', 'entertainment-channels.json')
 // api_functions.getVidCategories(youtube)
 // api_functions.getTopicIds()
