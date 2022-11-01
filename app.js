@@ -45,15 +45,12 @@ function createOptions(nextPageToken, category) {
   return options
 }
 
-function createChannelOptions(channelId) {
 
-}
-
-async function channelSearch() {
+async function channelSearch(token = '') {
   
-  let nextPageToken = '';
+  let nextPageToken = token;
   let channels = {};
-  let res = await youtube.search.list(createOptions(nextPageToken, '28'));
+  let res = await youtube.search.list(createOptions(nextPageToken, '22'));
   res.data.items.forEach(item => {
    
     // console.log(item.snippet.channelId)
@@ -70,7 +67,7 @@ async function channelSearch() {
   //run for loop to exhuast all results
   for (let index = 1; index < totalCycles; index++) {
     nextPageToken = res.data.nextPageToken;
-    res = await youtube.search.list(createOptions(nextPageToken, '26'));
+    res = await youtube.search.list(createOptions(nextPageToken, '22'));
     res.data.items.forEach(item => {
       if(!(item.snippet.channelId in channels)){
         channels[item.snippet.channelId] = item.snippet.channelTitle
@@ -79,7 +76,7 @@ async function channelSearch() {
   });
   }
   
-  fs.writeFile('science-tech-channels.json', JSON.stringify(channels, null, '\t') , function(err) {
+  fs.writeFile('check-people-channels.json', JSON.stringify(channels, null, '\t') , function(err) {
     if(err) {
       console.log(err);
     }
@@ -93,6 +90,18 @@ async function channelSearch() {
   3) repeat procedure for nextpage results
   */
 
+}
+
+async function appendChannels(pageToken) {
+  const channels_json = fs.readFileSync('people-blogs-channels.json', 'utf-8');
+  let channels = JSON.parse(channels_json);
+  channels['nextPage'] = pageToken;
+  fs.writeFile('people-blogs-channels.json', JSON.stringify(channels, null, '\t'), function(err) {
+    if(err) {
+      console.log(err);
+    }
+    console.log('Complete')
+  })
 }
 
 async function findActivities() {
@@ -174,9 +183,10 @@ async function getTopicIds() {
 // runSearch()
 // findActivities()
 // getChannelInfo()
-channelSearch()
+channelSearch('CKYEEAA')
 // getVidCategories()
 // getTopicIds()
+// appendtest('CKYEEAA')
 //start listening on port
 app.listen(PORT, () => {
     console.log(`Listening on port ... ${PORT}`)
