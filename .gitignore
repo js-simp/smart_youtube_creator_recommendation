@@ -13,6 +13,7 @@
 
 # misc
 /channels
+/lk_micro_creators
 .DS_Store
 .env
 .env.local
