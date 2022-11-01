@@ -3,7 +3,8 @@ const session = require('express-session')
 const dotenv = require('dotenv')
 const youtube_api = require('@googleapis/youtube');
 const fs = require('fs');
-const api_functions = require('./api-call-templates.js')
+const api_functions = require('./api-call-templates.js');
+const { createBrotliCompress } = require('zlib');
 dotenv.config();
 
 const app = express()
@@ -46,10 +47,13 @@ function createOptions(nextPageToken, category_topic, isCategory) {
 }
 async function channelInfo(channelId) {
   let res = await api_functions.getChannelInfo(youtube, channelId);
+  let channel_info = {}
   let items=res.data.items;
-  items.forEach(item => {
-    console.log(item.snippet, item.statistics, item.contentDetails)
-  });
+  channel_info[channelId] = res.data.items;
+  // items.forEach(item => {
+  //   console.log(item.snippet, item.statistics, item.contentDetails)
+  // });
+  writetoFile('micro-creators.json', channel_info)
 }
 
 async function channelSearch(token = '', filename, category_topic, isCategory) {
