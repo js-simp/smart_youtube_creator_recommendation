@@ -23,7 +23,7 @@ const youtube = youtube_api.youtube({
   });
 
 
-function createOptions(nextPageToken, category) {
+function createOptions(nextPageToken, category_topic, isCategory) {
   let date = new Date(2022-01-21)
   let options = {
     part: 'snippet',
@@ -31,9 +31,15 @@ function createOptions(nextPageToken, category) {
     locationRadius: '200km',
     type: 'video',
     publishedAfter	: date.toISOString(),
-    videoCategoryId: category,
     pageToken: nextPageToken ,
     maxResults: 50,
+  }
+
+  if(isCategory){
+    options.videoCategoryId = category_topic
+  }
+  else{
+    options.topicId = category_topic
   }
 
   return options
@@ -46,13 +52,13 @@ async function channelInfo(channelId) {
   });
 }
 
-async function channelSearch(token = '', filename) {
+async function channelSearch(token = '', filename, category_topic, isCategory) {
   
   let nextPageToken = token;
   let channels = readChannelsData(filename);
   //collect the total results available, and the first set of results in one call
   // let res = await youtube.search.list(createOptions(nextPageToken, '22'));
-  let res = await api_functions.runSearch(youtube, createOptions(nextPageToken, '24'))
+  let res = await api_functions.runSearch(youtube, createOptions(nextPageToken, category_topic, isCategory))
   res.data.items.forEach(item => {
    
     // console.log(item.snippet.channelId)
@@ -70,7 +76,7 @@ async function channelSearch(token = '', filename) {
   for (let index = 1; index < totalCycles; index++) {
     nextPageToken = res.data.nextPageToken;
     // res = await youtube.search.list(createOptions(nextPageToken, '22'));
-    res = await api_functions.runSearch(youtube, createOptions(nextPageToken, '24'))
+    res = await api_functions.runSearch(youtube, createOptions(nextPageToken, category_topic, isCategory))
     res.data.items.forEach(item => {
       if(!(item.snippet.channelId in channels)){
         channels[item.snippet.channelId] = item.snippet.channelTitle
@@ -108,7 +114,7 @@ function writetoFile(filename, data) {
 // api_functions.findActivities(youtube)
 
 channelInfo('UC9N1nzWyei0munVtz6zRt5w')
-// channelSearch('CMgBEAA', 'entertainment-channels.json')
+// channelSearch('CMgBEAA', './channels/entertainment-channels.json', '24', true)
 // api_functions.getVidCategories(youtube)
 // api_functions.getTopicIds()
 // appendtest('CKYEEAA')
