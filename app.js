@@ -100,8 +100,8 @@ function writetoFile(filename, data) {
 }
 
 // api_functions.findActivities(youtube)
-// api_functions.getChannelInfo(youtube)
-channelSearch('CMgBEAA', 'entertainment-channels.json')
+api_functions.getChannelInfo(youtube, channelId)
+// channelSearch('CMgBEAA', 'entertainment-channels.json')
 // api_functions.getVidCategories(youtube)
 // api_functions.getTopicIds()
 // appendtest('CKYEEAA')

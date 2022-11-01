@@ -17,13 +17,13 @@ let api_functions = {
         // console.log(res.data);
       },
       
-      getChannelInfo : async function getChannelInfo(youtube) {
-        const res = await youtube.channels.list({
-          part: 'brandingSettings,contentDetails,contentOwnerDetails,id,localizations,snippet,statistics,status,topicDetails',
-          channelId: 'UCRBpynZV0b7ww2XMCfC17qg',
-        });
-        console.log(res.data);
-      },
+    getChannelInfo : async function getChannelInfo(youtube, channelId) {
+      const res = await youtube.channels.list({
+        part: 'brandingSettings,contentDetails,contentOwnerDetails,id,localizations,snippet,statistics,status,topicDetails',
+        channelId: channelId,
+      });
+      return res
+    },
       
       getVidCategories : async function getVidCategories(youtube) {
         const res = await youtube.videoCategories.list({
