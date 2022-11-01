@@ -53,7 +53,15 @@ async function channelInfo(filename) {
   for (let index = 0; index < channels_arr.length; index++) {
     const channelId = channels_arr[index];
     let res = await api_functions.getChannelInfo(youtube, channelId);
-    channel_info[channelId] = res.data.items;
+    //filter all channels that have less than 100k subscribers
+    if(!res.data.items[0].statistics.hiddenSubscriberCount) {
+      if(parseInt(res.data.items[0].statistics.subscriberCount) < 100000) {
+        channel_info[channelId] = res.data.items;
+      }
+    }
+    else{
+      channel_info[channelId] = res.data.items[0];
+    }
   }
 
   // items.forEach(item => {
