@@ -67,6 +67,7 @@ async function channelInfo(filename) {
   let channel_info = readChannelsData('./lk_micro_creators/micro-creators.json');
   let channels_arr = Object.keys(channels);
   console.log(channels_arr.length)
+  let repeats = 0;
   for (let index = 0; index < channels_arr.length; index++) {
     const channelId = channels_arr[index];
 
@@ -83,13 +84,17 @@ async function channelInfo(filename) {
       channel_info[channelId] = res.data.items[0];
     }
     }
+    else{
+      repeats += 1;
+    }
     
   }
 
   // items.forEach(item => {
   //   console.log(item.snippet, item.statistics, item.contentDetails)
   // });
-  writetoFile('./lk_micro_creators/micro-creators.json', channel_info)
+  writetoFile('./lk_micro_creators/micro-creators.json', channel_info);
+  console.log("The number of channels already added are: ", repeats)
 }
 
 //----------------------channel Search--------------------------------------------
@@ -111,8 +116,9 @@ async function channelSearch(token = '', filename, category_topic, isCategory) {
   // console.log(res.data);
   let totalResults = res.data.pageInfo.totalResults;
   console.log(totalResults);
-  let totalCycles = Math.floor(totalResults/50) < 75? Math.floor(totalResults/50) : 75;
+  let totalCycles = Math.floor(totalResults/50) < 90? Math.floor(totalResults/50) : 90;
   let remainingResults = totalResults%50;
+  let repeats = 0;
   //run for loop to exhuast all results
   for (let index = 1; index < totalCycles; index++) {
     nextPageToken = res.data.nextPageToken;
@@ -122,12 +128,15 @@ async function channelSearch(token = '', filename, category_topic, isCategory) {
       if(!(item.snippet.channelId in channels)){
         channels[item.snippet.channelId] = item.snippet.channelTitle
       }
+      else{
+        repeats+=1;
+      }
       // console.log(item.snippet.channelId)
   });
   }
 
   writetoFile(filename, channels)
-  console.log(nextPageToken);
+  console.log(nextPageToken, repeats);
 }
 
 //-------------------reading and writing json functions ---------------------
@@ -157,8 +166,9 @@ function writetoFile(filename, data) {
 // api_functions.findActivities(youtube)
 // activityInfo('UC7oCWkWgXB5OOJAFv9HanyA')
 // channelInfo('./channels/people-blogs-channels.json')
-channelInfo('./health-topic-channels.json')
-// channelSearch('CJYBEAA', './channels/health-topic-channels.json', '/m/0kt51', false)
+// channelInfo('./channels/health-topic-channels.json')
+// channelInfo('./channels/edu-channels.json')
+// channelSearch('CPoBEAA', './channels/edu-channels.json', '27', true)
 // api_functions.getVidCategories(youtube)
 // api_functions.getTopicIds()
 // appendtest('CKYEEAA')
