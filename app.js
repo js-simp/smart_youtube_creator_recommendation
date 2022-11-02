@@ -64,13 +64,16 @@ async function activityInfo(channelId) {
 
 async function channelInfo(filename) {
   let channels = readChannelsData(filename);
-  let channel_info = {};
+  let channel_info = readChannelsData('./lk_micro_creators/micro-creators.json');
   let channels_arr = Object.keys(channels);
   console.log(channels_arr.length)
   for (let index = 0; index < channels_arr.length; index++) {
     const channelId = channels_arr[index];
-    let res = await api_functions.getChannelInfo(youtube, channelId);
-    //filter all channels that have less than 100k subscribers
+
+    if(!(channelId in channel_info)){
+      let res = await api_functions.getChannelInfo(youtube, channelId);
+
+      //filter all channels that have less than 100k subscribers
     if(!res.data.items[0].statistics.hiddenSubscriberCount) {
       if(parseInt(res.data.items[0].statistics.subscriberCount) < 100000) {
         channel_info[channelId] = res.data.items;
@@ -79,6 +82,8 @@ async function channelInfo(filename) {
     else{
       channel_info[channelId] = res.data.items[0];
     }
+    }
+    
   }
 
   // items.forEach(item => {
@@ -150,9 +155,10 @@ function writetoFile(filename, data) {
 }
 
 // api_functions.findActivities(youtube)
-activityInfo('UC7oCWkWgXB5OOJAFv9HanyA')
+// activityInfo('UC7oCWkWgXB5OOJAFv9HanyA')
 // channelInfo('./channels/people-blogs-channels.json')
-// channelSearch('CMgBEAA', './channels/entertainment-channels.json', '24', true)
+channelInfo('./health-topic-channels.json')
+// channelSearch('CJYBEAA', './channels/health-topic-channels.json', '/m/0kt51', false)
 // api_functions.getVidCategories(youtube)
 // api_functions.getTopicIds()
 // appendtest('CKYEEAA')
