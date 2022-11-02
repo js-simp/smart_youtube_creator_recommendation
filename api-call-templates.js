@@ -8,13 +8,14 @@ let api_functions = {
         return res
       },
 
-    findActivities : async function findActivities(youtube) {
+    findActivities : async function findActivities(youtube, channelId) {
         const res = await youtube.activities.list({
           part: 'snippet,contentDetails',
-          channelId: 'UCSHZKyawb77ixDdsGog4iWA',
-          maxResults: 5
+          channelId: channelId,
+          maxResults: 1
         });
         // console.log(res.data);
+        return res
       },
       
     getChannelInfo : async function getChannelInfo(youtube, channelId) {
@@ -22,6 +23,16 @@ let api_functions = {
         part: 'brandingSettings,contentDetails,contentOwnerDetails,id,localizations,snippet,statistics,status,topicDetails',
         id: channelId,
       });
+      return res
+    },
+
+    getVideoInfo : async function getVideoInfo(youtube, videoId) {
+      const res = await youtube.videos.list({
+        part: 'contentDetails,liveStreamingDetails,localizations,player,recordingDetails,snippet,statistics,status,topicDetails',
+        id : videoId,
+        maxResults : 1
+      })
+
       return res
     },
       
