@@ -71,8 +71,6 @@ async function activityInfo(filename) {
 
   writetoFile(filename, video_info);
   
-  process.exit()
-  
 }
 //-----------------------------Video Information ----------------------------------
 async function videoInfo(videoList) {
