@@ -48,7 +48,7 @@ function createOptions(nextPageToken, category_topic, isCategory) {
 
 //-----------------------------Get Activity Information for Micro Creator Channels --------------------
 async function activityInfo(filename) {
-  let channels = readChannelsData('./lk_micro_creators/micro_creators.json');
+  let channels = readChannelsData('./lk_micro_creators/micro-creators.json');
   let video_info = readChannelsData(filename);
   for (const key in channels) {
     if(!(key in video_info)) {
@@ -56,9 +56,11 @@ async function activityInfo(filename) {
       const res = await api_functions.findActivities(youtube, key);
       const videoList = [];
       res.data.items.forEach(item => {
-        if(item.snippet.type = 'upload'){
+        if(item.snippet.type == 'upload'){
           // console.log(item.contentDetails.upload.videoId);
-          videoList.push(item.contentDetails.upload.videoId);
+          if('videoId' in item.contentDetails.upload){
+            videoList.push(item.contentDetails.upload.videoId);
+          }
         }
       });
       //get video info of all the videoId's in videoList
@@ -186,7 +188,7 @@ function writetoFile(filename, data) {
 }
 
 // api_functions.findActivities(youtube)
-activityInfo('UCODfbodHJbRwlriV2Tyq0gA')
+activityInfo('./lk_micro_creators/video_info.json')
 // channelInfo('./channels/people-blogs-channels.json')
 // channelInfo('./channels/health-topic-channels.json')
 // channelInfo('./channels/edu-channels.json')
