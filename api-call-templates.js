@@ -12,7 +12,7 @@ let api_functions = {
         const res = await youtube.activities.list({
           part: 'snippet,contentDetails',
           channelId: channelId,
-          maxResults: 1
+          maxResults: 10
         });
         // console.log(res.data);
         return res

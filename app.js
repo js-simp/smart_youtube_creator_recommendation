@@ -47,17 +47,39 @@ function createOptions(nextPageToken, category_topic, isCategory) {
 }
 
 //-----------------------------Get Activity Information for Micro Creator Channels --------------------
-async function activityInfo(channelId) {
-  // let channels = readChannelsData(filename);
-  // const res = await api_functions.findActivities(youtube, channelId);
+async function activityInfo(filename) {
+  let channels = readChannelsData('./lk_micro_creators/micro_creators.json');
+  let video_info = readChannelsData(filename);
+  for (const key in channels) {
+    if(!(key in video_info)) {
+      //get the 10 latest activities of the channel
+      const res = await api_functions.findActivities(youtube, key);
+      const videoList = [];
+      res.data.items.forEach(item => {
+        if(item.snippet.type = 'upload'){
+          // console.log(item.contentDetails.upload.videoId);
+          videoList.push(item.contentDetails.upload.videoId);
+        }
+      });
+      //get video info of all the videoId's in videoList
+      video_info[key] = await videoInfo(videoList)
+      //write video_info to file
+    }
+  }
 
-  // console.log(res.data.items[0].snippet, res.data.items[0].contentDetails);
-
-  const res = await api_functions.getVideoInfo(youtube, 'bAky8do4Htw');
-  console.log(res.data.items[0].snippet, res.data.items[0].statistics, res.data.items[0].contentDetails)
-
+  writetoFile(filename, video_info);
+  
   process.exit()
   
+}
+//-----------------------------Video Information ----------------------------------
+async function videoInfo(videoList) {
+  let vid_info = {}
+  for (let index = 0; index < videoList.length; index++) {
+    const res = await api_functions.getVideoInfo(youtube, videoList[index]);
+    vid_info[videoList[index]] = res.data.items;
+  }
+  return vid_info
 }
 
 //-----------------------------Channel Information--------------------------------
@@ -164,7 +186,7 @@ function writetoFile(filename, data) {
 }
 
 // api_functions.findActivities(youtube)
-// activityInfo('UC7oCWkWgXB5OOJAFv9HanyA')
+activityInfo('UCODfbodHJbRwlriV2Tyq0gA')
 // channelInfo('./channels/people-blogs-channels.json')
 // channelInfo('./channels/health-topic-channels.json')
 // channelInfo('./channels/edu-channels.json')
